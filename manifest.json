@@ -1,0 +1,16 @@
+{
+    "name": "Black Night",
+    "short_name": "Black Night",
+    "icons": [
+        {
+            "src": "./icon.png",
+            "sizes": "192x192"
+        }
+    ],
+    "display": "standalone",
+    "scope": "/",
+    "start_url": "./?homescreen=true",
+    "orientation": "portrait",
+    "theme_color": "#000000",
+    "background_color": "#000000" 
+}
