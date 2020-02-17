@@ -1,57 +1,31 @@
   
-var CACHE_STATIC_NAME = 'static-v10';
-var CACHE_DYNAMIC_NAME = 'dynamic-v10';
-var STATIC_FILES = [
-    './index.html',
-    './offline.html',
-    './dist/styles.css',
-    './dist/scripts.js',
-    './dist/images/logo.png',
-    'https://fonts.googleapis.com/css?family=Lato:100,300,400,700,900',
-];
+/**
+ * Welcome to your Workbox-powered service worker!
+ *
+ * You'll need to register this file in your web app and you should
+ * disable HTTP caching for this file too.
+ * See https://goo.gl/nhQhGp
+ *
+ * The rest of the code is auto-generated. Please don't update this file
+ * directly; instead, make changes to your Workbox build configuration
+ * and re-run your build process.
+ * See https://goo.gl/2aRDsh
+ */
 
-self.addEventListener('install', function(event){
-    console.log('[Service Worker] Instalando o Service Worker...', event);
-    event.waitUntil(
-        caches.open(CACHE_STATIC_NAME)
-        .then(function(cache){
-            console.log('[Service Worker] App Precaching');
-            return cache.addAll(STATIC_FILES);
-        }).catch(function(){
-            console.error('Failed to cache', error);
-        })
-    );
-});
+importScripts("https://storage.googleapis.com/workbox-cdn/releases/4.3.1/workbox-sw.js");
 
-self.addEventListener('activate', function(event){
-    console.log('[Service Worker] Ativando Service Worker...', event);
-    event.waitUntil(
-        caches.keys()
-        .then(function(keyList){
-            return Promise.all(keyList.map( function(key) {
-                if(key !== CACHE_STATIC_NAME && key !== CACHE_DYNAMIC_NAME){
-                    console.log('[Service Worker] Removendo cache antiga.', key);
-                    return caches.delete(key);
-                }
-            }))
-        })
-    );
-    return self.clients.claim();
-});
+importScripts(
+  "/precache-manifest.695c4f21d1d04003e20aa3100631b46e.js"
+);
 
-self.addEventListener('fetch', function(e){
-    console.log('[Service Worker] Requisição', e);
-    e.respondWith(
-        caches.match(e.request).then(function(r) {
-              console.log('[Service Worker] Fetching resource: '+e.request.url);
-          return r || fetch(e.request).then(function(response) {
-                    return caches.open(CACHE_STATIC_NAME).then(function(cache) {
-              console.log('[Service Worker] Caching new resource: '+e.request.url);
-              cache.put(e.request, response.clone());
-              return response;
-            });
-          });
-        })
-      );
-});
+workbox.core.skipWaiting();
 
+workbox.core.clientsClaim();
+
+/**
+ * The workboxSW.precacheAndRoute() method efficiently caches and responds to
+ * requests for URLs in the manifest.
+ * See https://goo.gl/S9QRab
+ */
+self.__precacheManifest = [].concat(self.__precacheManifest || []);
+workbox.precaching.precacheAndRoute(self.__precacheManifest, {});
