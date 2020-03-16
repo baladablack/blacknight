@@ -4,7 +4,7 @@ self.addEventListener('fetch', () => {
 
 importScripts('https://cdn.ampproject.org/sw/amp-sw.js');
 AMP_SW.init({
-  assetCachingOpitions; [
+  assetCachingOpitions: [
     {regexp:/\.(png|jpg|svg|webp)/,
     cachingSrrategy: 'CACHE_FIRST'
   },
