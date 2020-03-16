@@ -14,7 +14,7 @@ AMP_SW.init({
     cachingStrategy: 'STALE_WHILE_REVALIDADATE'
      }
   ],
-  offilinePageOptions: {
+  offlinePageOptions: {
     url: '/offline.html',
     assets: []
   }
