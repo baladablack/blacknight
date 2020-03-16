@@ -9,8 +9,8 @@ AMP_SW.init({
     cachingSrrategy: 'CACHE_FIRST'
   },
   {
-    regexp:/\.(js)/,
-    cachingSrrategy: 'STALE_WHILE_REVALIDADTE'
+    regexp: /\.(js)/,
+    cachingStrategy: 'STALE_WHILE_REVALIDADATE'
   }
   ],
   offilinePageOptions: {
