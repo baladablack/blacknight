@@ -7,15 +7,15 @@ AMP_SW.init({
   assetCachingOpitions: [
     {
       regexp:/\.(png|jpg|svg|webp)/,
-    cachingStrategy: 'CACHE_FIRST'
+      cachingStrategy: 'CACHE_FIRST'
   },
   {
     regexp: /\.(js)/,
     cachingStrategy: 'STALE_WHILE_REVALIDADATE'
-  }
+     }
   ],
   offilinePageOptions: {
     url: '/offline.html',
-    assets:[]
+    assets: []
   }
 });
