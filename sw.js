@@ -6,7 +6,7 @@ importScripts('https://cdn.ampproject.org/sw/amp-sw.js');
 AMP_SW.init({
   assetCachingOpitions: [
     {
-      regexp:/\.(png|jpg|svg|webp)/,
+      regexp:/\.(png|jpg|svg|webp|css|js)/,
       cachingStrategy: 'CACHE_FIRST'
   },
   {
