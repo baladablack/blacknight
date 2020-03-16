@@ -6,11 +6,11 @@ importScripts('https://cdn.ampproject.org/sw/amp-sw.js');
 AMP_SW.init({
   assetCachingOpitions: [
     {
-      regexp:/\.(png|jpg|svg|webp|css|js)/,
+      regexp:/\.(png|jpg|svg|webp)/,
       cachingStrategy: 'CACHE_FIRST'
   },
   {
-    regexp: /\.(js)/,
+    regexp: /\.(js|css)/,
     cachingStrategy: 'STALE_WHILE_REVALIDADATE'
      }
   ],
