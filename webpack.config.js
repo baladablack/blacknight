@@ -1,5 +1,6 @@
 const webpack = require("webpack");
-const pkg = require("./package.json");
+const newLocal = "./package.json";
+const pkg = require(newLocal);
 const path = require("path");
 const libraryName = pkg.name;
 
