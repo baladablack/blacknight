@@ -387,7 +387,37 @@
 							}
 	
 				},
-				sections = {};
+				doEvent = function(id, type) {
+	
+					var name = id.split(/-[a-z]+$/)[0], i;
+	
+					if (name in sections
+					&&	'events' in sections[name]
+					&&	type in sections[name].events)
+						for (i in sections[name].events[type])
+							(sections[name].events[type][i])();
+	
+				},
+				sections = {
+					'offline': {
+						events: {
+							onopen: [
+								function() { 
+									gtag('config', 'UA-22743837-1', { 'page_path': '/#offline' });
+								},
+							],
+						},
+					},
+					'home': {
+						events: {
+							onopen: [
+								function() { 
+									gtag('config', 'UA-22743837-1', { 'page_path': '/' });
+								},
+							],
+						},
+					},
+				};
 	
 			// Expose doNext, doPrevious, doFirst, doLast.
 				window._next = doNext;
@@ -481,6 +511,9 @@
 	
 					// Activate initial section.
 						initialSection.classList.add('active');
+	
+						// Event: On Open.
+							doEvent(initialId, 'onopen');
 	
 					// Load elements.
 						loadElements(initialSection);
@@ -609,6 +642,9 @@
 								// Unload elements.
 									unloadElements(currentSection);
 	
+								// Event: On Close.
+									doEvent(currentSection.id, 'onclose');
+	
 							// Activate target section.
 	
 								// Show header and/or footer (if necessary).
@@ -633,6 +669,9 @@
 									section.classList.remove('inactive');
 									section.classList.add('active');
 									section.style.display = '';
+	
+								// Event: On Open.
+									doEvent(section.id, 'onopen');
 	
 							// Trigger 'resize' event.
 								trigger('resize');
