@@ -15,7 +15,7 @@ AMP_SW.init({
      }
   ],
   offlinePageOptions: {
-    url: '/offline.html',
+    url: '/index2.html#offline',
     assets: ['/assets/main.css', '/assets/main.js', '/assets/offline/image01.png', '/assets/offline/image02.png']
   }
 });
