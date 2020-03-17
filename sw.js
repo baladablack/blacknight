@@ -2,39 +2,21 @@ self.addEventListener('fetch', () => {
   // literally does nothing
 });
 
-const version = "0.6.18";
-const cacheName = `airhorner-${version}`;
-self.addEventListener('install', e => {
-  e.waitUntil(
-    caches.open(cacheName).then(cache => {
-      return cache.addAll([
-        `/assets/images/image01.png`,
-        `/assets/main.css`,
-        `/assets/main.js`,
-        `/scripts/main.min.js`,
-        `/scripts/comlink.global.js`,
-        `/scripts/messagechanneladapter.global.js`,
-        `/scripts/pwacompat.min.js`,
-        `/sounds/airhorn.mp3`
-      ])
-          .then(() => self.skipWaiting());
-    })
-  );
-});
+        var CACHE_NAME = 'static-v1';
 
-self.addEventListener('activate', event => {
-  event.waitUntil(self.clients.claim());
-});
-
-self.addEventListener('fetch', event => {
-  event.respondWith(
-    caches.open(cacheName)
-      .then(cache => cache.match(event.request, {ignoreSearch: true}))
-      .then(response => {
-      return response || fetch(event.request);
-    })
-  );
-});
+        self.addEventListener('install', function (event) {
+          event.waitUntil(
+            caches.open(CACHE_NAME).then(function (cache) {
+              return cache.addAll([
+                '/',
+                `/assets/images/image01.png`,
+                `/assets/main.css`,
+                `/assets/main.js`,
+                `/scripts/main.min.js`,
+              ]);
+            })
+          )
+        });
 
 importScripts('https://cdn.ampproject.org/sw/amp-sw.js');
 AMP_SW.init({
