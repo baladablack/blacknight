@@ -306,8 +306,8 @@ body.is-instant:after {
 
 #embed01 .frame iframe {
 	max-width: 100%;
-	width: 100rem;
-	height: 100rem;
+	width: 100vw;
+	height: 100vh;
 }
 
 .container > .inner {
