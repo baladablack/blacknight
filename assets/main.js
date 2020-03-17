@@ -176,6 +176,518 @@
 	
 		};
 	
+	// Sections.
+		(function() {
+	
+			var initialSection, initialScrollPoint, initialId,
+				header, footer, name, hideHeader, hideFooter,
+				h, e, ee, k,
+				locked = false,
+				doNext = function() {
+	
+					var section;
+	
+					section = $('#main > .inner > section.active').nextElementSibling;
+	
+					if (!section || section.tagName != 'SECTION')
+						return;
+	
+					location.href = '#' + section.id.replace(/-section$/, '');
+	
+				},
+				doPrevious = function() {
+	
+					var section;
+	
+					section = $('#main > .inner > section.active').previousElementSibling;
+	
+					if (!section || section.tagName != 'SECTION')
+						return;
+	
+					location.href = '#' + (section.matches(':first-child') ? '' : section.id.replace(/-section$/, ''));
+	
+				},
+				doFirst = function() {
+	
+					var section;
+	
+					section = $('#main > .inner > section:first-of-type');
+	
+					if (!section || section.tagName != 'SECTION')
+						return;
+	
+					location.href = '#' + section.id.replace(/-section$/, '');
+	
+				},
+				doLast = function() {
+	
+					var section;
+	
+					section = $('#main > .inner > section:last-of-type');
+	
+					if (!section || section.tagName != 'SECTION')
+						return;
+	
+					location.href = '#' + section.id.replace(/-section$/, '');
+	
+				},
+				doScroll = function(e, style, duration) {
+	
+					var y, cy, dy,
+						start, easing, f;
+	
+					// Element.
+	
+						// No element? Assume top of page.
+							if (!e)
+								y = 0;
+	
+						// Otherwise ...
+							else
+								switch (e.dataset.scrollBehavior ? e.dataset.scrollBehavior : 'default') {
+	
+									case 'default':
+									default:
+	
+										y = e.offsetTop;
+	
+										break;
+	
+									case 'center':
+	
+										if (e.offsetHeight < window.innerHeight)
+											y = e.offsetTop - ((window.innerHeight - e.offsetHeight) / 2);
+										else
+											y = e.offsetTop;
+	
+										break;
+	
+									case 'previous':
+	
+										if (e.previousElementSibling)
+											y = e.previousElementSibling.offsetTop + e.previousElementSibling.offsetHeight;
+										else
+											y = e.offsetTop;
+	
+										break;
+	
+								}
+	
+					// Style.
+						if (!style)
+							style = 'smooth';
+	
+					// Duration.
+						if (!duration)
+							duration = 750;
+	
+					// Instant? Just scroll.
+						if (style == 'instant') {
+	
+							window.scrollTo(0, y);
+							return;
+	
+						}
+	
+					// Get start, current Y.
+						start = Date.now();
+						cy = window.scrollY;
+						dy = y - cy;
+	
+					// Set easing.
+						switch (style) {
+	
+							case 'linear':
+								easing = function (t) { return t };
+								break;
+	
+							case 'smooth':
+								easing = function (t) { return t<.5 ? 4*t*t*t : (t-1)*(2*t-2)*(2*t-2)+1 };
+								break;
+	
+						}
+	
+					// Scroll.
+						f = function() {
+	
+							var t = Date.now() - start;
+	
+							// Hit duration? Scroll to y and finish.
+								if (t >= duration)
+									window.scroll(0, y);
+	
+							// Otherwise ...
+								else {
+	
+									// Scroll.
+										window.scroll(0, cy + (dy * easing(t / duration)));
+	
+									// Repeat.
+										requestAnimationFrame(f);
+	
+								}
+	
+						};
+	
+						f();
+	
+				},
+				loadElements = function(parent) {
+	
+					var a, i;
+	
+					// IFRAMEs.
+	
+						// Get list of unloaded IFRAMEs.
+							a = parent.querySelectorAll('iframe[data-src]:not([data-src=""])');
+	
+						// Step through list.
+							for (i=0; i < a.length; i++) {
+	
+								// Load.
+									a[i].src = a[i].dataset.src;
+	
+								// Mark as loaded.
+									a[i].dataset.src = "";
+	
+							}
+	
+				},
+				unloadElements = function(parent) {
+	
+					var a, i;
+	
+					// IFRAMEs.
+	
+						// Get list of loaded IFRAMEs.
+							a = parent.querySelectorAll('iframe[data-src=""]');
+	
+						// Step through list.
+							for (i=0; i < a.length; i++) {
+	
+								// Mark as unloaded.
+									a[i].dataset.src = a[i].src;
+	
+								// Unload.
+									a[i].src = '';
+	
+							}
+	
+					// Video.
+	
+						// Get list of videos.
+							a = parent.querySelectorAll('video');
+	
+						// Step through list.
+							for (i=0; i < a.length; i++) {
+	
+								// Pause.
+									a[i].pause();
+	
+							}
+	
+				},
+				sections = {};
+	
+			// Expose doNext, doPrevious, doFirst, doLast.
+				window._next = doNext;
+				window._previous = doPrevious;
+				window._first = doFirst;
+				window._last = doLast;
+	
+			// Initialize.
+	
+				// Set scroll restoration to manual.
+					if ('scrollRestoration' in history)
+						history.scrollRestoration = 'manual';
+	
+				// Header, footer.
+					header = $('#header');
+					footer = $('#footer');
+	
+				// Show initial section.
+	
+					// Determine target.
+						h = thisHash();
+	
+						// Contains invalid characters? Might be a third-party hashbang, so ignore it.
+							if (h
+							&&	!h.match(/^[a-zA-Z0-9\-]+$/))
+								h = null;
+	
+						// Scroll point.
+							if (e = $('[data-scroll-id="' + h + '"]')) {
+	
+								initialScrollPoint = e;
+								initialSection = initialScrollPoint.parentElement;
+								initialId = initialSection.id;
+	
+							}
+	
+						// Section.
+							else if (e = $('#' + (h ? h : 'home') + '-section')) {
+	
+								initialScrollPoint = null;
+								initialSection = e;
+								initialId = initialSection.id;
+	
+							}
+	
+						// Missing initial section?
+							if (!initialSection) {
+	
+								// Default to index.
+									initialScrollPoint = null;
+									initialSection = $('#' + 'home' + '-section');
+									initialId = initialSection.id;
+	
+								// Clear index URL hash.
+									history.replaceState(undefined, undefined, '#');
+	
+							}
+	
+					// Deactivate all sections (except initial).
+	
+						// Initially hide header and/or footer (if necessary).
+							name = (h ? h : 'home');
+							hideHeader = name ? ((name in sections) && ('hideHeader' in sections[name]) && sections[name].hideHeader) : false;
+							hideFooter = name ? ((name in sections) && ('hideFooter' in sections[name]) && sections[name].hideFooter) : false;
+	
+							// Header.
+								if (header && hideHeader) {
+	
+									header.classList.add('hidden');
+									header.style.display = 'none';
+	
+								}
+	
+							// Footer.
+								if (footer && hideFooter) {
+	
+									footer.classList.add('hidden');
+									footer.style.display = 'none';
+	
+								}
+	
+						// Deactivate.
+							ee = $$('#main > .inner > section:not([id="' + initialId + '"])');
+	
+							for (k = 0; k < ee.length; k++) {
+	
+								ee[k].className = 'inactive';
+								ee[k].style.display = 'none';
+	
+							}
+	
+					// Activate initial section.
+						initialSection.classList.add('active');
+	
+					// Load elements.
+						loadElements(initialSection);
+	
+				 	// Scroll to top.
+						doScroll(null, 'instant');
+	
+				// Load event.
+					on('load', function() {
+	
+						// Scroll to initial scroll point (if applicable).
+					 		if (initialScrollPoint)
+								doScroll(initialScrollPoint, 'instant');
+	
+					});
+	
+			// Hashchange event.
+				on('hashchange', function(event) {
+	
+					var section, scrollPoint, id, sectionHeight, currentSection, currentSectionHeight,
+						name, hideHeader, hideFooter,
+						h, e, ee, k;
+	
+					// Lock.
+						if (locked)
+							return false;
+	
+					// Determine target.
+						h = thisHash();
+	
+						// Contains invalid characters? Might be a third-party hashbang, so ignore it.
+							if (h
+							&&	!h.match(/^[a-zA-Z0-9\-]+$/))
+								return false;
+	
+						// Scroll point.
+							if (e = $('[data-scroll-id="' + h + '"]')) {
+	
+								scrollPoint = e;
+								section = scrollPoint.parentElement;
+								id = section.id;
+	
+							}
+	
+						// Section.
+							else if (e = $('#' + (h ? h : 'home') + '-section')) {
+	
+								scrollPoint = null;
+								section = e;
+								id = section.id;
+	
+							}
+	
+						// Anything else.
+							else {
+	
+								// Default to index.
+									scrollPoint = null;
+									section = $('#' + 'home' + '-section');
+									id = section.id;
+	
+								// Clear index URL hash.
+									history.replaceState(undefined, undefined, '#');
+	
+							}
+	
+					// No section? Bail.
+						if (!section)
+							return false;
+	
+					// Section already active?
+						if (!section.classList.contains('inactive')) {
+	
+						 	// Scroll to scroll point (if applicable).
+						 		if (scrollPoint)
+									doScroll(scrollPoint);
+	
+							// Otherwise, just scroll to top.
+								else
+									doScroll(null);
+	
+							// Bail.
+								return false;
+	
+						}
+	
+					// Otherwise, activate it.
+						else {
+	
+							// Lock.
+								locked = true;
+	
+							// Clear index URL hash.
+								if (location.hash == '#home')
+									history.replaceState(null, null, '#');
+	
+							// Deactivate current section.
+	
+								// Hide header and/or footer (if necessary).
+									name = (section ? section.id.replace(/-section$/, '') : null);
+									hideHeader = name ? ((name in sections) && ('hideHeader' in sections[name]) && sections[name].hideHeader) : false;
+									hideFooter = name ? ((name in sections) && ('hideFooter' in sections[name]) && sections[name].hideFooter) : false;
+	
+									// Header.
+										if (header && hideHeader) {
+	
+											header.classList.add('hidden');
+											header.style.display = 'none';
+	
+										}
+	
+									// Footer.
+										if (footer && hideFooter) {
+	
+											footer.classList.add('hidden');
+											footer.style.display = 'none';
+	
+										}
+	
+								// Deactivate.
+									currentSection = $('#main > .inner > section:not(.inactive)');
+									currentSection.classList.add('inactive');
+									currentSection.classList.remove('active');
+									currentSection.style.display = 'none';
+	
+								// Unload elements.
+									unloadElements(currentSection);
+	
+							// Activate target section.
+	
+								// Show header and/or footer (if necessary).
+	
+									// Header.
+										if (header && !hideHeader) {
+	
+											header.style.display = '';
+											header.classList.remove('hidden');
+	
+										}
+	
+									// Footer.
+										if (footer && !hideFooter) {
+	
+											footer.style.display = '';
+											footer.classList.remove('hidden');
+	
+										}
+	
+								// Activate.
+									section.classList.remove('inactive');
+									section.classList.add('active');
+									section.style.display = '';
+	
+							// Trigger 'resize' event.
+								trigger('resize');
+	
+							// Load elements.
+								loadElements(section);
+	
+							// Scroll to scroll point (if applicable).
+								if (scrollPoint)
+									doScroll(scrollPoint, 'instant');
+	
+							// Otherwise, just scroll to top.
+								else
+									doScroll(null, 'instant');
+	
+							// Unlock.
+								locked = false;
+	
+						}
+	
+					return false;
+	
+				});
+	
+				// Hack: Allow hashchange to trigger on click even if the target's href matches the current hash.
+					on('click', function(event) {
+	
+						var t = event.target;
+	
+						// Target is an image and its parent is a link? Switch target to parent.
+							if (t.tagName == 'IMG'
+							&&	t.parentElement
+							&&	t.parentElement.tagName == 'A')
+								t = t.parentElement;
+	
+						// Target is an anchor *and* its href is a hash that matches the current hash?
+							if (t.tagName == 'A'
+							&&	t.getAttribute('href').substr(0, 1) == '#'
+							&&	t.hash == window.location.hash) {
+	
+								// Prevent default.
+									event.preventDefault();
+	
+								// Replace state with '#'.
+									history.replaceState(undefined, undefined, '#');
+	
+								// Replace location with target hash.
+									location.replace(t.hash);
+	
+							}
+	
+					});
+	
+		})();
+	
 	// Browser hacks.
 	
 		// Init.
@@ -554,5 +1066,114 @@
 					})();
 	
 			}
+	
+	// Deferred.
+		(function() {
+	
+			var items = $$('.deferred'),
+				f;
+	
+			// Polyfill: NodeList.forEach()
+				if (!('forEach' in NodeList.prototype))
+					NodeList.prototype.forEach = Array.prototype.forEach;
+	
+			// Initialize items.
+				items.forEach(function(p) {
+	
+					var i = p.firstElementChild;
+	
+					// Set parent to placeholder.
+						p.style.backgroundImage = 'url(' + i.src + ')';
+						p.style.backgroundSize = '100% 100%';
+						p.style.backgroundPosition = 'top left';
+						p.style.backgroundRepeat = 'no-repeat';
+	
+					// Hide image.
+						i.style.opacity = 0;
+						i.style.transition = 'opacity 0.375s ease-in-out';
+	
+					// Load event.
+						i.addEventListener('load', function(event) {
+	
+							// Not "done" yet? Bail.
+								if (i.dataset.src !== 'done')
+									return;
+	
+							// Show image.
+								if (Date.now() - i._startLoad < 375) {
+	
+									p.classList.remove('loading');
+									p.style.backgroundImage = 'none';
+									i.style.transition = '';
+									i.style.opacity = 1;
+	
+								}
+								else {
+	
+									p.classList.remove('loading');
+									i.style.opacity = 1;
+	
+									setTimeout(function() {
+										p.style.backgroundImage = 'none';
+									}, 375);
+	
+								}
+	
+						});
+	
+				});
+	
+			// Handler function.
+				f = function() {
+	
+					var	height = document.documentElement.clientHeight,
+						top = (client.os == 'ios' ? document.body.scrollTop : document.documentElement.scrollTop),
+						bottom = top + height;
+	
+					// Step through items.
+						items.forEach(function(p) {
+	
+							var i = p.firstElementChild;
+	
+							// Not visible? Bail.
+								if (i.offsetParent === null)
+									return true;
+	
+							// "Done" already? Bail.
+								if (i.dataset.src === 'done')
+									return true;
+	
+							// Get image position.
+								var	x = i.getBoundingClientRect(),
+									imageTop = top + Math.floor(x.top) - height,
+									imageBottom = top + Math.ceil(x.bottom) + height,
+									src;
+	
+							// Falls within viewable area of viewport?
+								if (imageTop <= bottom && imageBottom >= top) {
+	
+									// Get src, mark as "done".
+										src = i.dataset.src;
+										i.dataset.src = 'done';
+	
+									// Mark parent as loading.
+										p.classList.add('loading');
+	
+									// Swap placeholder for real image src.
+										i._startLoad = Date.now();
+										i.src = src;
+	
+								}
+	
+						});
+	
+				};
+	
+			// Add event listeners.
+				on('load', f);
+				on('resize', f);
+				on('scroll', f);
+	
+		})();
 
 })();
