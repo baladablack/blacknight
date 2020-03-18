@@ -2,7 +2,7 @@ self.addEventListener('fetch', () => {
   // literally does nothing
 });
 
-importScripts('https://cdn.ampproject.org/sw/amp-sw.js');
+importScripts('https://cdn.ampproject.org/v0.js');
 AMP_SW.init({
   assetCachingOpitions: [
     {
