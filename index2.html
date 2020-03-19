@@ -24,7 +24,7 @@
 		<script src="./pwa.dev.min.js"></script>
 		<script src="./webpack.config.js"></script>
 		<script> if (navigator.serviceWorker) { navigator.serviceWorker.register ('./sw.js') } </script>
-		
+	<PWAPrompt promptOnVisit={1} timesToShow={3} copyClosePrompt="Close" permanentlyHideOnDismiss={false}/>	
 	</head>
 	<body>
 		<div id="wrapper">
@@ -64,7 +64,6 @@
 			</div>
 		</div>
 		<script src="assets/main.js"></script>
+
 		
-		<PWAPrompt promptOnVisit={1} timesToShow={3} copyClosePrompt="Close" permanentlyHideOnDismiss={false}/>
-	</body>
 </html>
