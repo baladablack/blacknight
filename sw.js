@@ -3,6 +3,8 @@ self.addEventListener('fetch', () => {
 });
 
 
+
+
 AMP_SW.init({
   assetCachingOpitions: [
     {
