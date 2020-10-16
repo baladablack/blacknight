@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Push Notification Sender</title>
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1, maximum-scale=1">
+<!-- Bootstrap Style -->
+<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css">
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js "></script>
+ 
+<style>
+.push-form-container {
+    margin: auto;
+    padding: 30px;
+    box-shadow: 0 2px 10px 0 rgba(0,0,0,.16), 0 2px 5px 0 rgba(0,0,0,.26);
+}
+.push-form-container .push-form-heading {
+    color: #fff;
+    font-size: 18px;
+    position: relative;
+    padding: 20px 30px;
+    background-color: #66afe9;
+    margin: -30px -30px 30px -30px;
+}
+.push-form .btn-primary {
+    border-color: #50a3e6;
+    background-color: #66afe9;
+}
+</style>
+</head>
+<body>
+<div class="container"> 
+	<div class="push-form"> 
+		<div class="row"> 
+			<div class="col-md-6 col-md-offset-3"> 
+				<div class="push-form-container"> 
+					<div class="push-form-heading">Push Notification Sender</div> 
+					<form id='pushForm'>
+						<div class="form-group">
+							<label for="key">FCM Server Key</label>
+							<input id="key" name="key" class="form-control" type="text" placeholder="Enter Push API Key">
+						</div>
+						<div class="form-group">
+							<label for="title">Title</label>
+							<input id="title" name="title" class="form-control" type="text" placeholder="Push Title">
+						</div>
+						<div class="form-group">
+							<label for="imgurl">Image URL</label>
+							<input id="imgurl" name="imgurl" class="form-control" type="text" placeholder="Image URL">
+						</div>
+						<div class="form-group">
+							<label for="message">Message</label>
+							<textarea id="message" name="message" class="form-control" rows="3" placeholder="Push Message"></textarea>
+						</div>
+						<div class="form-group">
+							<label for="url">URL</label>
+							<input id="url" name="url" class="form-control" type="text" value="https://cms.appcastor.com/pwapp/5ef5004929867/index.html">
+						</div>
+						<input type="hidden" name="push_type" value="individual"/>
+						<input type="hidden" name="urlkey" value="5ef5004929867"/>
+						<div class="text-left">
+							<input class="btn btn-primary" type="submit" value="Send">
+						</div>
+					</form>
+					<br>
+					<div id='response'></div>
+				</div> 
+			</div> 
+		</div> 
+	</div> 
+</div>  
+
+<script>
+$(document).ready(function(){
+$('#pushForm').submit(function(){
+
+$('#response').html("<b>Loading response...</b>");
+
+$.ajax({
+type: 'POST',
+url: '../push_send_api.php',
+data: $(this).serialize() 
+})
+.done(function(data){ 
+
+$('#response').html(data);
+
+})
+.fail(function() { 
+
+alert( "Posting failed." );
+
+});
+
+return false;
+
+});
+});
+</script>	
+</body>
+</html>
